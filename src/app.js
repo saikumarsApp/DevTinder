@@ -1,14 +1,37 @@
 const express = require("express");
-
+const connectDB = require("./config/database");
+const User = require("./models/user");
 const app = express();
 
-app.get("/user", (req, res) => {
-    res.send({firstname: "Sai Kumar", lastname: "Bhukya"});
-})
-app.use("/hello", (req, res) => {
-    res.send("Hello Welcome!");
+
+app.post("/signup", async (req, res) => {
+    const user = new User({
+        firstName: "Sai Kumar",
+        lastName: "Bhukya",
+        email: "saikumar@bhukya",
+        password: "saikumar@123"
+    });
+    try{
+        await user.save();
+        res.send("user added successfully");
+    }catch(err){
+        res.send(err.message);
+    }
+});
+
+app.get("/user", async(req, res) => {
+    res.send("Hello");
 })
 
-app.listen(3000, () => {
-    console.log("Server  is running");
+connectDB()
+    .then(() => {
+    console.log("Connection is Established");  
+    app.listen(3000, () => {
+        console.log("Server  is running");
+    })  
+    })
+    
+    .catch((err) => {
+    console.error("Connection Error");
 })
+
