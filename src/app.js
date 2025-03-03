@@ -3,14 +3,20 @@ const connectDB = require("./config/database");
 const User = require("./models/user");
 const app = express();
 
+app.use(express.json());
+
+app.get("/users", async(req, res) => {
+    try{
+        const users = await User.find({});
+        res.send(users);
+        
+    }catch(err){
+        res.status(404).send(`Error is ${err.message}`);
+    }
+})
 
 app.post("/signup", async (req, res) => {
-    const user = new User({
-        firstName: "Sai Kumar",
-        lastName: "Bhukya",
-        email: "saikumar@bhukya",
-        password: "saikumar@123"
-    });
+    const user = new User(req.body);
     try{
         await user.save();
         res.send("user added successfully");
@@ -19,9 +25,17 @@ app.post("/signup", async (req, res) => {
     }
 });
 
-app.get("/user", async(req, res) => {
-    res.send("Hello");
-})
+
+app.patch("/update", async (req, res) => {
+    const userId = req.body.userId;
+    const data = req.body;
+    try{
+        const update = await User.findByIdAndUpdate(userId, data)
+        res.send("user updated successfully");
+    }catch(err){
+        res.status(404).send(`error is ${err.message}`);
+    }
+});
 
 connectDB()
     .then(() => {
